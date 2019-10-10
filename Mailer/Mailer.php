@@ -8,6 +8,7 @@ use Hackzilla\Bundle\TicketBundle\Entity\TicketMessage;
 use Hackzilla\Bundle\TicketBundle\Entity\TicketWithAttachment;
 use Hackzilla\Bundle\TicketBundle\TicketEvents;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Pelago\Emogrifier;
 
 /**
  * Class Mailer
@@ -20,6 +21,8 @@ class Mailer
      */
     private $container;
 
+	private $emogrifier;
+
     /**
      * Mailer constructor.
      *
@@ -28,6 +31,10 @@ class Mailer
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
+        $this->emogrifier = new Emogrifier();
+        $this->emogrifier->setCss(file_get_contents(
+	        $this->container->get('kernel')->getRootDir() . '/../web/assets/styles/email.css'
+	        ));
     }
 
     /**
@@ -79,7 +86,7 @@ class Mailer
         if ($message->getUser() !== $creator->getId()) {
             $recipients[] = $creator->getEmail();
         }
-        
+
         // Add every user with the ROLE_TICKET_ADMIN role
         /** @var User $user */
         foreach ($users as $user) {
@@ -104,6 +111,7 @@ class Mailer
 
         // Create the message body in HTML
         $format = 'text/html';
+
         $this->addMessagePart($message, $templateHTML, $args, $format);
 
         // Create the message body in plain text
@@ -154,8 +162,15 @@ class Mailer
                 break;
             case 'text/html':
             default:
+
+		        $this->emogrifier->setHtml($this->container->get('twig')->render($template, [
+			        'ticket' => $args['ticket'],
+			        'logo' => $message->embed(\Swift_Image::fromPath('assets/images/logo_email.png')),
+		        ]));
+
                 $message->setBody(
-                    $this->container->get('twig')->render($template, $args),
+//                    $this->container->get('twig')->render($template, $args),
+                    $this->emogrifier->emogrify(),
                     $format
                 );
                 break;
