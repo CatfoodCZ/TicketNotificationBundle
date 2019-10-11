@@ -40,11 +40,11 @@ class Mailer
     /**
      * Send a notification by e-mail to the concerned users when a ticket has been created|modified|deleted.
      *
-     * @param TicketInterface $ticket
+     * @param TicketWithAttachment $ticket
      * @param string $eventName
      * @return null
      */
-    public function sendTicketNotificationEmailMessage(TicketInterface $ticket, $eventName)
+    public function sendTicketNotificationEmailMessage(TicketWithAttachment $ticket, $eventName)
     {
         // Retrieve the creator
         /** @var User $creator */
