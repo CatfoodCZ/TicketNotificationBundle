@@ -55,7 +55,7 @@ class Mailer
             case TicketEvents::TICKET_CREATE:
                 $subject = $this->container->get('translator')->trans('emails.ticket.new.subject', array(
                     '%number%' => $ticket->getId(),
-                    '%sender%' => $creator->getUsername(),
+                    '%sender%' => $creator->getFirstName() . '' . $creator->getSurname(),
                 ));
                 $templateHTML = $this->container->getParameter('flodaq_ticket_notification.templates')['new_html'];
                 $templateTxt = $this->container->getParameter('flodaq_ticket_notification.templates')['new_txt'];
@@ -63,7 +63,7 @@ class Mailer
             case TicketEvents::TICKET_UPDATE:
                 $subject = $this->container->get('translator')->trans('emails.ticket.update.subject', array(
                     '%number%' => $ticket->getId(),
-                    '%sender%' => $creator->getUsername(),
+                    '%sender%' => $creator->getFirstName() . '' . $creator->getSurname(),
                 ));
                 $templateHTML = $this->container->getParameter('flodaq_ticket_notification.templates')['update_html'];
                 $templateTxt = $this->container->getParameter('flodaq_ticket_notification.templates')['update_txt'];
